@@ -1,33 +1,55 @@
 import streamlit as st
 import pandas as pd
-import requests
 
-def fetch_weather_data(city):
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid=YOUR_API_KEY&units=metric"
-    response = requests.get(url)
-    data = response.json()
-    return data
+# Dummy-Daten für Module
+modules_data = {
+    "Modulnummer": ["CS101", "MATH202", "ENG303"],
+    "Modulname": ["Einführung in die Informatik", "Lineare Algebra", "Fortgeschrittene englische Grammatik"],
+    "Dozent": ["Prof. Müller", "Dr. Schmidt", "Prof. Meier"]
+}
+
+# Dummy-Daten für Bewertungen
+reviews_data = {
+    "Modulnummer": ["CS101", "MATH202", "ENG303"],
+    "Bewertung": [4.5, 3.8, 4.2],
+    "Kommentar": ["Toller Kurs!", "Gute Lehrmaterialien, aber schwierige Prüfungen.", "Interessante Vorlesungen."]
+}
+
+modules_df = pd.DataFrame(modules_data)
+reviews_df = pd.DataFrame(reviews_data)
 
 def main():
-    st.title("Wettervorhersage App")
+    st.title("Modulbewertungs-App")
 
-    # Eingabefeld für den Städtenamen
-    city = st.text_input("Gib den Namen einer Stadt ein:", "Berlin")
+    page = st.sidebar.selectbox("Seite auswählen", ["Modulbewertungen", "Bewertung abgeben"])
 
-    # Button zum Abrufen der Wetterdaten
-    if st.button("Wettervorhersage abrufen"):
-        weather_data = fetch_weather_data(city)
-
-        # Wenn Daten erfolgreich abgerufen wurden, visualisiere sie
-        if weather_data.get("cod") == 200:
-            st.subheader(f"Wetter in {city}:")
-            st.write(f"Temperatur: {weather_data['main']['temp']} °C")
-            st.write(f"Luftfeuchtigkeit: {weather_data['main']['humidity']} %")
-            st.write(f"Windgeschwindigkeit: {weather_data['wind']['speed']} m/s")
+    if page == "Modulbewertungen":
+        st.header("Modulbewertungen")
+        selected_module = st.selectbox("Modul auswählen", modules_df["Modulname"])
+        module_reviews = reviews_df[reviews_df["Modulnummer"] == modules_df.loc[modules_df["Modulname"] == selected_module, "Modulnummer"].values[0]]
+        
+        if not module_reviews.empty:
+            st.subheader(f"Bewertungen für {selected_module}:")
+            st.write(module_reviews)
         else:
-            st.write("Wetterdaten konnten nicht abgerufen werden. Bitte überprüfe den Städtenamen.")
+            st.write("Keine Bewertungen für dieses Modul vorhanden.")
+
+    elif page == "Bewertung abgeben":
+        st.header("Bewertung abgeben")
+        selected_module = st.selectbox("Modul auswählen", modules_df["Modulname"])
+        rating = st.slider("Bewertung (1-5)", 1, 5)
+        comment = st.text_area("Kommentar")
+        submit_button = st.button("Bewertung absenden")
+
+        if submit_button:
+            module_number = modules_df.loc[modules_df["Modulname"] == selected_module, "Modulnummer"].values[0]
+            new_review = pd.DataFrame({"Modulnummer": [module_number], "Bewertung": [rating], "Kommentar": [comment]})
+            reviews_df = reviews_df.append(new_review, ignore_index=True)
+            st.success("Vielen Dank für Ihre Bewertung!")
 
 if __name__ == "__main__":
     main()
+
+
 
 
