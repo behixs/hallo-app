@@ -18,7 +18,7 @@ def filter_vorlesungen(interessen):
 
 # Streamlit App
 def main():
-    st.title("Vorlesungsfinder")
+    st.title("Coursematch")
 
     # Benutzereingabe für Interessen
     interessen = st.multiselect("Wählen Sie Ihre Interessen aus:", ["Informatik", "Mathematik", "Kunst", "Psychologie"])
