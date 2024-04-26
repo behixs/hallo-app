@@ -24,7 +24,7 @@ st.subheader("Input Ingredients separated by comma")
 ingredients = st.text_input("Ingredients", placeholder="Flour, eggs, ...")
 
 #FImplementation of function which joins the recipes with suitable ingriedients
-e suitabke ingredients 
+e suitable ingredients 
 def get_recipes():
     global recipes_data
     recipes_data = []
