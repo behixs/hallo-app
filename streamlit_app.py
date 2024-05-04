@@ -23,6 +23,7 @@ def get_recipes(ingredients: list) -> dict:
     else:
         recipes_data = "Something went wrong."
 
+
 def format_amount_number(amount: float) -> str:
     amount = round(amount,2)
     if amount == int(amount):
@@ -79,23 +80,22 @@ for recipe in recipes_data:
             st.write("Ingredients used:")
             for ingredient in recipe["usedIngredients"]:
                 amount_str = format_amount_number(people_count*ingredient['amount'])
-                st.write(f"- {amount_str} {ingredient['originalName']}")
+                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
 
         if missed_ingredients:
             st.write("Missing ingredients:")
             for ingredient in recipe["missedIngredients"]:
                 amount_str = format_amount_number(people_count*ingredient['amount'])
-                st.write(f"- {amount_str} {ingredient['originalName']}")
+                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
 
         if unused_ingredients:
             st.write("Ingredients not used:")
             for ingredient in recipe["unusedIngredients"]:
                 amount_str = format_amount_number(people_count*ingredient['amount'])
-                st.write(f"- {amount_str} {ingredient['originalName']}")
+                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
 
     # Image area
     with col2:
         st.image(recipe["image"], caption=recipe["title"], use_column_width=True)
-        df = create_ingredients_dataframe(people_count, recipe)
-        st.pyplot(df.plot.pie(y='Amount', figsize=(5, 5)))
+        st.bar_chart(create_ingredients_dataframe(people_count, recipe))
 
