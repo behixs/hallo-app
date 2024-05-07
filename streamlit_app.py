@@ -2,9 +2,6 @@ import os
 import streamlit as st
 import pandas as pd
 import requests
-import plotly.express as px
-import matplotlib.pyplot as plt
-
 
 API_KEY = os.getenv("API_KEY")
 API_BASE_URL = "https://api.spoonacular.com"
@@ -41,9 +38,15 @@ def create_ingredients_dataframe(people_count: int, recipe: list):
         name = ingredient['originalName']
         data[name] = people_count * ingredient['amount']
     
-    # Create the pie chart
-    fig = px.pie(values=list(data.values()), names=list(data.keys()), title='Ingredients Distribution')
-    st.plotly_chart(fig)
+    # Create pie chart
+    labels = list(data.keys())
+    values = list(data.values())
+    total = sum(values)
+    percentages = [round((value / total) * 100, 2) for value in values]
+
+    st.write("Ingredients Distribution:")
+    for label, percentage in zip(labels, percentages):
+        st.write(f"{label}: {percentage}%")
 
 # Setup page
 st.set_page_config(page_title="Recipe Finder", page_icon="🍽️")
