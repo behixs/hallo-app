@@ -39,7 +39,7 @@ def create_ingredients_dataframe(people_count: int, recipe: list):
         name = ingredient['originalName']
         data[name] = people_count * ingredient['amount']
     
-    # Erstelle das Kuchendiagramm
+    # Create the pie chart
     fig = px.pie(values=list(data.values()), names=list(data.keys()), title='Ingredients Distribution')
     st.plotly_chart(fig)
 
