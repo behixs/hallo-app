@@ -2,11 +2,10 @@ import os
 import streamlit as st
 import pandas as pd
 import requests
-
+import matplotlib.pyplot as plt
 
 API_KEY = os.getenv("API_KEY")
 API_BASE_URL = "https://api.spoonacular.com"
-
 
 def get_recipes(ingredients: list) -> dict:
     # Use global variable as st.button onclick doesn't return data
@@ -23,7 +22,6 @@ def get_recipes(ingredients: list) -> dict:
     else:
         recipes_data = "Something went wrong."
 
-
 def format_amount_number(amount: float) -> str:
     amount = round(amount,2)
     if amount == int(amount):
@@ -31,23 +29,22 @@ def format_amount_number(amount: float) -> str:
     else:
         return str(amount)
 
-
-def create_ingredients_dataframe(people_count: int, recipe: list) -> pd.DataFrame:
-    # Create pandas dataframe for barchart
+def create_ingredients_dataframe(people_count: int, recipe: list):
     data = {}
     for ingredient in recipe["usedIngredients"]:
         name = ingredient['originalName']
-        data[name] = people_count*ingredient['amount']
+        data[name] = people_count * ingredient['amount']
 
     for ingredient in recipe["missedIngredients"]:
         name = ingredient['originalName']
-        data[name] = people_count*ingredient['amount']
-    df = pd.DataFrame.from_dict(data, orient = 'index')
-    # Rename columns for frontend
-    df.rename(columns={0: 'Amount'}, inplace=True)
-    df.index.name = 'Ingredient'
-    return df
-
+        data[name] = people_count * ingredient['amount']
+    
+    # Erstelle das Kuchendiagramm
+    plt.figure(figsize=(8, 8))
+    plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
+    plt.title('Ingredients Distribution')
+    plt.axis('equal')  # Gleiches Seitenverhältnis für eine perfekte Kreisform
+    plt.show()
 
 # Setup page
 st.set_page_config(page_title="Recipe Finder", page_icon="🍽️")
@@ -79,23 +76,16 @@ for recipe in recipes_data:
         if used_ingredients:
             st.write("Ingredients used:")
             for ingredient in recipe["usedIngredients"]:
-                amount_str = format_amount_number(people_count*ingredient['amount'])
+                amount_str = format_amount_number(people_count * ingredient['amount'])
                 st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
 
         if missed_ingredients:
             st.write("Missing ingredients:")
             for ingredient in recipe["missedIngredients"]:
-                amount_str = format_amount_number(people_count*ingredient['amount'])
+                amount_str = format_amount_number(people_count * ingredient['amount'])
                 st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
 
         if unused_ingredients:
             st.write("Ingredients not used:")
             for ingredient in recipe["unusedIngredients"]:
-                amount_str = format_amount_number(people_count*ingredient['amount'])
-                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
-
-    # Image area
-    with col2:
-        st.image(recipe["image"], caption=recipe["title"], use_column_width=True)
-        st.bar_chart(create_ingredients_dataframe(people_count, recipe))
-
+                amount_str = format_amo
