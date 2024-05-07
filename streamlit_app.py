@@ -3,6 +3,8 @@ import streamlit as st
 import pandas as pd
 import requests
 import plotly.express as px
+import matplotlib.pyplot as plt
+
 
 API_KEY = os.getenv("API_KEY")
 API_BASE_URL = "https://api.spoonacular.com"
