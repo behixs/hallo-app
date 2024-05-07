@@ -51,4 +51,44 @@ st.write("""Discover delicious recipes based on the ingredients you have on
             your next meal.""")
 
 # Ingredients and people Input and search button
-st.subheader("Input Ingredients separated by
+st.subheader("Input Ingredients separated by comma")
+people_count = st.number_input("Number of people", min_value=1, max_value=100, step=1, value=1)
+ingredients = st.text_input("Ingredients", placeholder="Flour, eggs, ...")
+st.button("Search Recipes", on_click=get_recipes(ingredients))
+
+if recipes_data:
+    st.subheader("Recipes")
+
+for recipe in recipes_data:
+    used_ingredients = recipe["usedIngredients"]
+    missed_ingredients = recipe["missedIngredients"]
+    unused_ingredients = recipe["unusedIngredients"]
+
+    if used_ingredients or missed_ingredients or unused_ingredients:
+        st.markdown(f"<h4>{recipe['title']}</h4>", unsafe_allow_html=True)
+
+    # Ingredients area
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        if used_ingredients:
+            st.write("Ingredients used:")
+            for ingredient in recipe["usedIngredients"]:
+                amount_str = format_amount_number(people_count * ingredient['amount'])
+                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
+
+        if missed_ingredients:
+            st.write("Missing ingredients:")
+            for ingredient in recipe["missedIngredients"]:
+                amount_str = format_amount_number(people_count * ingredient['amount'])
+                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
+
+        if unused_ingredients:
+            st.write("Ingredients not used:")
+            for ingredient in recipe["unusedIngredients"]:
+                amount_str = format_amount_number(people_count * ingredient['amount'])
+                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
+
+    # Image area
+    with col2:
+        st.image(recipe["image"], caption=recipe["title"], use_column_width=True)
+        create_ingredients_dataframe(people_count, recipe)
