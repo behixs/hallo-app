@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import pandas as pd
 import requests
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 API_KEY = os.getenv("API_KEY")
 API_BASE_URL = "https://api.spoonacular.com"
@@ -40,11 +40,8 @@ def create_ingredients_dataframe(people_count: int, recipe: list):
         data[name] = people_count * ingredient['amount']
     
     # Erstelle das Kuchendiagramm
-    plt.figure(figsize=(8, 8))
-    plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
-    plt.title('Ingredients Distribution')
-    plt.axis('equal')  # Gleiches Seitenverhältnis für eine perfekte Kreisform
-    plt.show()
+    fig = px.pie(values=list(data.values()), names=list(data.keys()), title='Ingredients Distribution')
+    st.plotly_chart(fig)
 
 # Setup page
 st.set_page_config(page_title="Recipe Finder", page_icon="🍽️")
@@ -54,38 +51,4 @@ st.write("""Discover delicious recipes based on the ingredients you have on
             your next meal.""")
 
 # Ingredients and people Input and search button
-st.subheader("Input Ingredients separated by comma")
-people_count = st.number_input("Number of people", min_value=1, max_value=100, step=1, value=1)
-ingredients = st.text_input("Ingredients", placeholder="Flour, eggs, ...")
-st.button("Search Recipes", on_click=get_recipes(ingredients))
-
-if recipes_data:
-    st.subheader("Recipes")
-
-for recipe in recipes_data:
-    used_ingredients = recipe["usedIngredients"]
-    missed_ingredients = recipe["missedIngredients"]
-    unused_ingredients = recipe["unusedIngredients"]
-
-    if used_ingredients or missed_ingredients or unused_ingredients:
-        st.markdown(f"<h4>{recipe['title']}</h4>", unsafe_allow_html=True)
-
-    # Ingredients area
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        if used_ingredients:
-            st.write("Ingredients used:")
-            for ingredient in recipe["usedIngredients"]:
-                amount_str = format_amount_number(people_count * ingredient['amount'])
-                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
-
-        if missed_ingredients:
-            st.write("Missing ingredients:")
-            for ingredient in recipe["missedIngredients"]:
-                amount_str = format_amount_number(people_count * ingredient['amount'])
-                st.write(f"- {amount_str} {ingredient['unitLong']} {ingredient['originalName']}")
-
-        if unused_ingredients:
-            st.write("Ingredients not used:")
-            for ingredient in recipe["unusedIngredients"]:
-                amount_str = format_amo
+st.subheader("Input Ingredients separated by
